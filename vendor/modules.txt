@@ -50,8 +50,6 @@ github.com/blang/semver
 # github.com/dollarshaveclub/new-relic-synthetics-go v0.0.0-20170605224734-4dc3dd6ae884
 github.com/dollarshaveclub/new-relic-synthetics-go
 github.com/dollarshaveclub/new-relic-synthetics-go/util
-# github.com/dollarshaveclub/terraform-provider-nrs v0.0.0-20180801181246-f51b8ddea8ca
-github.com/dollarshaveclub/terraform-provider-nrs/pkg/provider
 # github.com/fatih/color v1.7.0
 github.com/fatih/color
 # github.com/golang/protobuf v1.3.0
