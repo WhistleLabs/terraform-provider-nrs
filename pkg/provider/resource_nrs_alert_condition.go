@@ -54,6 +54,17 @@ func NRSAlertConditionResource() *schema.Resource {
 	}
 }
 
+func schemaId(resourceData *schema.ResourceData) (int, error) {
+	sresid := resourceData.Id()
+	iresid, err := strconv.Atoi(sresid)
+	if (err != nil) {
+		return -1, fmt.Errorf("Could not convert resourceData.Id() value [%s] to int.", sresid)
+	}
+
+	return iresid, nil
+}
+
+
 // NRSAlertConditionCreate creates a Synthetics alert condition using
 // Terraform configuration.
 func NRSAlertConditionCreate(resourceData *schema.ResourceData, meta interface{}) error {
@@ -100,7 +111,13 @@ func NRSAlertConditionImportState(d *schema.ResourceData, meta interface{}) ([]*
 func NRSAlertConditionExists(resourceData *schema.ResourceData, meta interface{}) (bool, error) {
 	client := meta.(*synthetics.Client)
 
-	_, err := client.GetAlertCondition(uint(resourceData.Get("policy_id").(int)), uint(resourceData.Get("id").(int)))
+	iresid, err := schemaId(resourceData)
+
+	if err == nil {
+		return false, errors.Wrapf(err, "error: could not determine id in resource data")
+	}
+
+	_, err = client.GetAlertCondition(uint(resourceData.Get("policy_id").(int)), uint(iresid))
 	if err == synthetics.ErrAlertConditionNotFound {
 		return false, nil
 	}
