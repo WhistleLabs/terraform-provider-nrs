@@ -56,9 +56,10 @@ func NRSAlertConditionResource() *schema.Resource {
 
 func schemaId(resourceData *schema.ResourceData) (int, error) {
 	sresid := resourceData.Id()
+
 	iresid, err := strconv.Atoi(sresid)
 	if (err != nil) {
-		return -1, fmt.Errorf("Could not convert resourceData.Id() value [%s] to int.", sresid)
+		return -1, fmt.Errorf("error: could not determine/convert id from resourceData.Id()=\"%s\" to int.", sresid)
 	}
 
 	return iresid, nil
@@ -88,6 +89,7 @@ func NRSAlertConditionCreate(resourceData *schema.ResourceData, meta interface{}
 
 	return nil
 }
+
 // NRSAlertConditionImportState imports given condition to Terraform state
 // using policy_id and condition_id from New Relic alerts API
 func NRSAlertConditionImportState(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
@@ -132,7 +134,12 @@ func NRSAlertConditionExists(resourceData *schema.ResourceData, meta interface{}
 func NRSAlertConditionDelete(resourceData *schema.ResourceData, meta interface{}) error {
 	client := meta.(*synthetics.Client)
 
-	if err := client.DeleteAlertCondition(uint(resourceData.Get("id").(int))); err != nil {
+	iresid, err := schemaId(resourceData)
+	if err != nil {
+		return err
+	}
+
+	if err = client.DeleteAlertCondition(uint(iresid)); err != nil {
 		return errors.Wrap(err, "error: could not delete alert condition")
 	}
 
@@ -144,7 +151,12 @@ func NRSAlertConditionDelete(resourceData *schema.ResourceData, meta interface{}
 func NRSAlertConditionRead(resourceData *schema.ResourceData, meta interface{}) error {
 	client := meta.(*synthetics.Client)
 
-	ac, err := client.GetAlertCondition(uint(resourceData.Get("policy_id").(int)), uint(resourceData.Get("id").(int)))
+	iresid, err := schemaId(resourceData)
+	if err != nil {
+		return err
+	}
+
+	ac, err := client.GetAlertCondition(uint(resourceData.Get("policy_id").(int)), uint(iresid))
 	if err != nil {
 		return errors.Wrapf(err, "error: could not find alert condition")
 	}
