@@ -112,9 +112,8 @@ func NRSAlertConditionExists(resourceData *schema.ResourceData, meta interface{}
 	client := meta.(*synthetics.Client)
 
 	iresid, err := schemaId(resourceData)
-
-	if err == nil {
-		return false, errors.Wrapf(err, "error: could not determine id in resource data")
+	if err != nil {
+		return false, err
 	}
 
 	_, err = client.GetAlertCondition(uint(resourceData.Get("policy_id").(int)), uint(iresid))
